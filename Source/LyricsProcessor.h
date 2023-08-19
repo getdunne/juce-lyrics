@@ -33,9 +33,15 @@ public:
 
     juce::String currentLyric;
 
+    struct TimedLyric { double timeSec; juce::String lyricText; };
+    juce::OwnedArray<TimedLyric> lyrics;
+
 protected:
-    int lastTimeSec;
+    void loadLrcFile(juce::File);
+    int getIndexOfLyricForTime(double timeSec);
 
 private:
+    int currentLyricIndex;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LyricsProcessor)
 };
