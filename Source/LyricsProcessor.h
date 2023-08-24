@@ -1,5 +1,6 @@
 #pragma once
 #include <JuceHeader.h>
+#include "TimedText.h"
 
 class LyricsProcessor   : public juce::AudioProcessor
                         , public juce::ChangeBroadcaster
@@ -33,15 +34,10 @@ public:
 
     juce::String currentLyric;
 
-    struct TimedLyric { double timeSec; juce::String lyricText; };
-    juce::OwnedArray<TimedLyric> lyrics;
-
-protected:
-    void loadLrcFile(juce::File);
-    int getIndexOfLyricForTime(double timeSec);
 
 private:
-    int currentLyricIndex;
+    TimedText lyrics;
+    TimedText::Cue* currentCue;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LyricsProcessor)
 };

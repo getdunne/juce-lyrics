@@ -4,6 +4,8 @@
               jucerFormatVersion="1" projectLineFeed="&#10;" pluginFormats="buildAU,buildVST,buildVST3">
   <MAINGROUP id="DksJsW" name="Lyrics">
     <GROUP id="{2063D8EA-2821-FEB2-A6C9-264B3A4A96CB}" name="Source">
+      <FILE id="WZFDBw" name="TimedText.cpp" compile="1" resource="0" file="Source/TimedText.cpp"/>
+      <FILE id="q99A7S" name="TimedText.h" compile="0" resource="0" file="Source/TimedText.h"/>
       <FILE id="lkgAWC" name="LyricsProcessor.cpp" compile="1" resource="0"
             file="Source/LyricsProcessor.cpp"/>
       <FILE id="hZJoQn" name="LyricsProcessor.h" compile="0" resource="0"
