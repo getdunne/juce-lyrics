@@ -20,9 +20,10 @@ LyricsProcessor::LyricsProcessor()
                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                       )
     , currentCue(nullptr)
+    , currentTimeSec(0.0)
 {
     juce::File lrcFile("C:\\Users\\owner\\Documents\\GitHub\\juce-lyrics\\LRC Files\\test.lrc");
-    lyrics.loadLrcFile(lrcFile);
+    loadLrcFile(lrcFile);
 }
 
 LyricsProcessor::~LyricsProcessor()
@@ -32,6 +33,7 @@ LyricsProcessor::~LyricsProcessor()
 void LyricsProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     currentCue = nullptr;
+    currentTimeSec = 0.0;
 }
 
 void LyricsProcessor::releaseResources()
@@ -40,7 +42,9 @@ void LyricsProcessor::releaseResources()
 
 void LyricsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    if (lyrics.isEmpty()) return;
+    if (isEmpty()) return;
+
+    bool currentCueChanged = false;
 
     auto ph = getPlayHead();
     if (ph)
@@ -51,7 +55,10 @@ void LyricsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
             auto timeSec = hostPosition->getTimeInSeconds();
             if (timeSec)
             {
-                auto cue = lyrics.getCueForTime(*timeSec);
+                currentTimeSec = *timeSec;
+                auto cue = getCueForTime(*timeSec);
+                if (cue != currentCue) currentCueChanged = true;
+
                 if (cue)
                 {
                     currentCue = cue;
@@ -59,13 +66,20 @@ void LyricsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
                 }
                 else currentLyric.clear();
             }
-            else currentLyric = "No Playhead Time!";
         }
-        else currentLyric = "No Playhead Position!";
     }
-    else currentLyric = "No Playhead!";
 
-    sendChangeMessage();
+    if (currentCueChanged)
+        sendChangeMessage();
+}
+
+void LyricsProcessor::getLyricsView(juce::TextEditor& view,
+                                    int regularFontHeight, juce::Colour regularColour,
+                                    int boldFontHeight, juce::Colour boldColour)
+{
+    juce::Font regularFont(regularFontHeight);
+    juce::Font boldFont(boldFontHeight, juce::Font::bold);
+    getLyricsViewForTime(currentTimeSec, view, regularFont, regularColour, boldFont, boldColour);
 }
 
 void LyricsProcessor::getStateInformation(juce::MemoryBlock& destData)

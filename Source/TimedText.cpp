@@ -31,3 +31,33 @@ TimedText::Cue* TimedText::getCueForTime(double timeSec)
         if ((timeSec >= cue->startSec) && (timeSec < cue->endSec)) return cue;
     return nullptr;
 }
+
+void TimedText::getLyricsViewForTime(double timeSec, juce::TextEditor& view,
+                                     juce::Font& regularFont, juce::Colour regularColour,
+                                     juce::Font& boldFont, juce::Colour boldColour)
+{
+    view.clear();
+    view.setCaretPosition(0);
+
+    int startOfBoldText = 0;
+
+    for (int i = 0; i < 50; i++) view.insertTextAtCaret("\n");
+    for (auto cue : cues)
+    {
+        if ((timeSec >= cue->startSec) && (timeSec < cue->endSec))
+        {
+            view.setFont(boldFont);
+            view.setColour(juce::TextEditor::textColourId, boldColour);
+            startOfBoldText = view.getCaretPosition();
+        }
+        else
+        {
+            view.setFont(regularFont);
+            view.setColour(juce::TextEditor::textColourId, regularColour);
+        }
+        view.insertTextAtCaret(cue->text + "\n");
+    }
+    for (int i = 0; i < 50; i++) view.insertTextAtCaret("\n");
+
+    view.setCaretPosition(startOfBoldText);
+}

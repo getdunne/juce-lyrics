@@ -4,6 +4,7 @@
 
 class LyricsProcessor   : public juce::AudioProcessor
                         , public juce::ChangeBroadcaster
+                        , public TimedText
 {
 public:
     LyricsProcessor();
@@ -33,11 +34,14 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     juce::String currentLyric;
+    TimedText::Cue* currentCue;
 
+    void getLyricsView(juce::TextEditor& view,
+        int regularFontHeight, juce::Colour regularColour,
+        int boldFontHeight, juce::Colour boldColour);
 
 private:
-    TimedText lyrics;
-    TimedText::Cue* currentCue;
+    double currentTimeSec;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LyricsProcessor)
 };

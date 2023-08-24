@@ -16,7 +16,10 @@ public:
 	Cue* getCueForTime(double timeSec);
 
 protected:
-	juce::OwnedArray<Cue> cues;
+	void getLyricsViewForTime(double timeSec, juce::TextEditor& view,
+		juce::Font& regularFont, juce::Colour regularColour,
+		juce::Font& boldFont, juce::Colour boldColour);
 
 private:
+	juce::OwnedArray<Cue> cues;
 };

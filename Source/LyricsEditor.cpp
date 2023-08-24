@@ -1,10 +1,22 @@
 #include "LyricsProcessor.h"
 #include "LyricsEditor.h"
 
-LyricsEditor::LyricsEditor (LyricsProcessor& p)
-    : AudioProcessorEditor (&p), lyricsProcessor (p)
+LyricsEditor::LyricsEditor(LyricsProcessor& p)
+    : AudioProcessorEditor(&p), lyricsProcessor(p)
+    , backgroundColour(juce::Colours::black)
+    , regularColour(juce::Colours::white)
+    , boldColour(juce::Colours::aqua)
+    , regularFontHeight(20)
+    , boldFontHeight(24)
 {
-    setSize (400, 300);
+    lyricsView.setMultiLine(true);
+    lyricsView.setReadOnly(true);
+    lyricsView.setJustification(juce::Justification::centred);
+    lyricsView.setScrollbarsShown(false);
+    addAndMakeVisible(lyricsView);
+
+    setResizable(true, true);
+    setSize (512, 300);
 
     lyricsProcessor.addChangeListener(this);
 }
@@ -14,16 +26,19 @@ LyricsEditor::~LyricsEditor()
     lyricsProcessor.removeChangeListener(this);
 }
 
-void LyricsEditor::paint (juce::Graphics& g)
+void LyricsEditor::resized()
 {
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
-    g.setColour(juce::Colours::white);
-    g.setFont(15.0f);
-    g.drawFittedText(lyricsProcessor.currentLyric, getLocalBounds(), juce::Justification::centred, 1);
+    lyricsView.setBounds(getLocalBounds());
+    updateLyricsView();
 }
 
-void LyricsEditor::changeListenerCallback(juce::ChangeBroadcaster*)
+void LyricsEditor::paint (juce::Graphics& g)
 {
-    repaint();
+    g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+}
+
+void LyricsEditor::updateLyricsView()
+{
+    lyricsProcessor.getLyricsView(lyricsView, regularFontHeight, regularColour, boldFontHeight, boldColour);
+    lyricsView.scrollEditorToPositionCaret(0, lyricsView.getHeight() / 2 - boldFontHeight);
 }
