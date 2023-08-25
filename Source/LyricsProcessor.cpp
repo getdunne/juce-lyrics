@@ -30,8 +30,6 @@ LyricsProcessor::LyricsProcessor()
     , otherFontHeight(14)
 {
     clear();
-    lines.add(new Line({ 0.0, 1.0, "Click icon to open Settings," }));
-    lines.add(new Line({ 1.0, std::numeric_limits<double>::max(), "Then load a LRC file" }));
 }
 
 LyricsProcessor::~LyricsProcessor()

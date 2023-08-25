@@ -5,7 +5,7 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
     : AudioProcessorEditor(&p), lyricsProcessor(p)
     , settingsButton(BinaryData::settings_svg)
 {
-    loadLrcButton.setButtonText("Load LRC file...");
+    loadLrcButton.setButtonText("Click to load LRC file...");
     loadLrcButton.onClick = [this]()
     {
         juce::FileChooser chooser("LRC File",
@@ -87,6 +87,7 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
     addAndMakeVisible(lyricsView);
 
     settingsButton.setClickingTogglesState(true);
+    settingsButton.setToggleState(lyricsProcessor.isEmpty(), juce::NotificationType::dontSendNotification);
     settingsButton.onClick = [this]() { resized(); };
     addAndMakeVisible(settingsButton);
 
