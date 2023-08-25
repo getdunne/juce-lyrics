@@ -3,7 +3,7 @@ This is a [JUCE](https://juce.com) based plug-in to display karaoke-style lyrics
 
 ## Graphical user interface
 
-![interface](C:\Users\owner\Documents\GitHub\juce-lyrics\interface.png)
+![interface](interface.png)
 
 The screenshot above shows the full GUI, including the "settings controls" at the top, and the "lyrics area" below. When you first open the plug-in, the lyrics area will be empty; you must use the button at the very top to load lyrics from an [LRC file](https://en.wikipedia.org/wiki/LRC_(file_format)) (see below). As soon as some lyrics have been loaded (either manually from an LRC file, or because they were saved in the plug-in state), the GUI will open with the lyrics area expanded to the full window size, and the "gear" (settings) icon at the top left. Click the gear icon to show/hide the settings controls.
 
