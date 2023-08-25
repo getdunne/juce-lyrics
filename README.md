@@ -23,11 +23,11 @@ The **Offset (sec)** slider allows you to adjust the *offset time* added to comp
 
 ## LRC files
 
-This plug-in makes use of a slight variation of the standard [Simple LRC format](https://en.wikipedia.org/wiki/LRC_(file_format)) format, wherein an extra "bpm" line, e.g. 
+This plug-in makes use of a slight variation of the standard [Simple LRC format](https://en.wikipedia.org/wiki/LRC_(file_format)) format, with three alterations:
 
-`[bpm: 94]`
-
-may be included, to specify the *reference BPM rate*. If no such line is included, lyric start- and end-times will be treated as absolute; the plug-in will not attempt to adjust them based on the host BPM rate.
+1. Multiple time tags (for repeating lyrics) are not supported.
+2. Extra "non-lyric" lines (which may be blank) without time-tags may be interspersed freely among the time-tagged lyric lines for formatting.
+3. Optionally, a "bpm" tag line, e.g. `[bpm: 94]`, may be included, to specify the *reference BPM rate*. If no such line is included, lyric start- and end-times will be treated as absolute; the plug-in will not attempt to adjust them based on the host BPM rate.
 
 Note this plug-in *does not* recognize the LRC "A2 extension" (individual word time-tags).
 
