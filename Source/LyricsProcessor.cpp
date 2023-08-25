@@ -83,7 +83,7 @@ void LyricsProcessor::getLyricsView(juce::TextEditor& view)
     juce::Font lyricsFont(lyricsFontHeight);
     juce::Font highlightFont(highlightFontHeight, juce::Font::bold);
     juce::Font otherFont(otherFontHeight);
-    getViewForTime(currentTimeSec, view,
+    getView(currentLyricLine, view,
         lyricsFont, lyricsColour, highlightFont, highlightColour, otherFont, otherColour);
 }
 

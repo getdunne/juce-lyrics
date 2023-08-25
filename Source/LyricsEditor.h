@@ -81,6 +81,9 @@ private:
     juce::Slider otherFontSizeSlider;
     ColourChangeButton otherColourChangeButton;
 
+    juce::Label offsetLabel;
+    juce::Slider offsetSlider;
+
     juce::TextEditor lyricsView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LyricsEditor)

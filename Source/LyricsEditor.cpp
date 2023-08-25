@@ -13,6 +13,7 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
         if (chooser.browseForFileToOpen())
         {
             lyricsProcessor.loadLrcFile(chooser.getResult());
+            offsetSlider.setValue(lyricsProcessor.getOffsetSec(), juce::NotificationType::dontSendNotification);
             updateLyricsView();
         }
     };
@@ -66,6 +67,19 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
     otherColourChangeButton.onColourChange = [this]() { updateLyricsView(); };
     addAndMakeVisible(otherColourChangeButton);
 
+    offsetLabel.setJustificationType(juce::Justification::right);
+    offsetLabel.setText("Offset (sec)", juce::NotificationType::dontSendNotification);
+    offsetLabel.attachToComponent(&offsetSlider, true);
+
+    offsetSlider.setRange(-20.0, 20.0);
+    offsetSlider.setValue(lyricsProcessor.getOffsetSec(), juce::NotificationType::dontSendNotification);
+    offsetSlider.onValueChange = [this]()
+    {
+        lyricsProcessor.setOffsetSec(offsetSlider.getValue());
+        updateLyricsView();
+    };
+    addAndMakeVisible(offsetSlider);
+
     lyricsView.setMultiLine(true);
     lyricsView.setReadOnly(true);
     lyricsView.setJustification(juce::Justification::centred);
@@ -77,9 +91,10 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
     addAndMakeVisible(settingsButton);
 
     setResizable(true, true);
-    setSize (512, 400);
+    setSize (600, 500);
 
     lyricsProcessor.addChangeListener(this);
+    updateLyricsView();
 }
 
 LyricsEditor::~LyricsEditor()
@@ -92,7 +107,7 @@ void LyricsEditor::resized()
     auto area = getLocalBounds();
     if (settingsButton.getToggleState())
     {
-        auto settingsArea = area.removeFromTop(5 * 10 + 4 * 24).reduced(10);
+        auto settingsArea = area.removeFromTop(6 * 10 + 5 * 24).reduced(10);
         settingsArea.removeFromLeft(100);   // space for labels
 
         loadLrcButton.setBounds(settingsArea.removeFromTop(24));
@@ -114,6 +129,10 @@ void LyricsEditor::resized()
         otherColourChangeButton.setBounds(row.removeFromRight(70));
         row.removeFromRight(6);
         otherFontSizeSlider.setBounds(row);
+        settingsArea.removeFromTop(10);
+
+        row = settingsArea.removeFromTop(24);
+        offsetSlider.setBounds(row);
     }
     lyricsView.setBounds(area);
 

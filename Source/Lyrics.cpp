@@ -23,6 +23,7 @@ juce::XmlElement* Lyrics::getXml()
 {
     auto xml = new juce::XmlElement("Lyrics");
     xml->setAttribute("bpm", bpm);
+    xml->setAttribute("offsetSec", offsetSec);
     for (auto cue : lines)
         xml->addChildElement(cue->getXml());
     return xml;
@@ -35,6 +36,7 @@ void Lyrics::putXml(juce::XmlElement* xml)
     {
         jassert(xml->hasTagName("Lyrics"));
         bpm = xml->getDoubleAttribute("bpm");
+        offsetSec = xml->getDoubleAttribute("offsetSec");
         for (auto cueXml : xml->getChildWithTagNameIterator("LyricLine"))
         {
             auto ll = new Line;
@@ -72,6 +74,11 @@ void Lyrics::loadLrcFile(juce::File lrcFile)
             // reference BPM tag
             bpm = fileLine.substring(5).getDoubleValue();
         }
+        else if (fileLine.matchesWildcard("[offset:*", true))
+        {
+            // time offset, seconds
+            offsetSec = fileLine.substring(8).getDoubleValue();
+        }
     }
 
     // fix lyric-line end-times (except the last one)
@@ -90,19 +97,37 @@ void Lyrics::loadLrcFile(juce::File lrcFile)
             }
         }
     }
+
+#if 0
+    std::unique_ptr<juce::XmlElement> xml(getXml());
+    DBG(xml->toString());
+#endif
 }
 
 Lyrics::Line* Lyrics::getLineForTime(double timeSec)
 {
+    timeSec += offsetSec;
     for (auto ll : lines)
-        if ((timeSec >= ll->startSec) && (timeSec < ll->endSec)) return ll;
+        if ((timeSec >= ll->startSec) && (timeSec < ll->endSec))
+        {
+#if 0
+            if (timeSec != 0.0) DBG(juce::String(timeSec) + ": " + ll->text);
+#endif
+            return ll;
+        }
+
+    // if no match, return the first lyric line
+    for (auto ll : lines)
+        if (ll->endSec > ll->startSec) return ll;
+
+    // if no lyric lines at all, return null
     return nullptr;
 }
 
-void Lyrics::getViewForTime(double timeSec, juce::TextEditor& view,
-                            juce::Font& lyricsFont, juce::Colour lyricsColour,
-                            juce::Font& highlightFont, juce::Colour highlightColour,
-                            juce::Font& otherFont, juce::Colour otherColour)
+void Lyrics::getView(Line* highlightedLine, juce::TextEditor& view,
+                     juce::Font& lyricsFont, juce::Colour lyricsColour,
+                     juce::Font& highlightFont, juce::Colour highlightColour,
+                     juce::Font& otherFont, juce::Colour otherColour)
 {
     view.clear();
     view.setCaretPosition(0);
@@ -112,7 +137,7 @@ void Lyrics::getViewForTime(double timeSec, juce::TextEditor& view,
     for (int i = 0; i < 50; i++) view.insertTextAtCaret("\n");
     for (auto ll : lines)
     {
-        if ((timeSec >= ll->startSec) && (timeSec < ll->endSec))
+        if (ll == highlightedLine)
         {
             view.setFont(highlightFont);
             view.setColour(juce::TextEditor::textColourId, highlightColour);
