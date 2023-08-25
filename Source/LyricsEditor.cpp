@@ -5,6 +5,19 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
     : AudioProcessorEditor(&p), lyricsProcessor(p)
     , settingsButton(BinaryData::settings_svg)
 {
+    loadLrcButton.setButtonText("Load LRC file...");
+    loadLrcButton.onClick = [this]()
+    {
+        juce::FileChooser chooser("LRC File",
+            juce::File::getSpecialLocation(juce::File::SpecialLocationType::userDocumentsDirectory), "*.lrc");
+        if (chooser.browseForFileToOpen())
+        {
+            lyricsProcessor.loadLrcFile(chooser.getResult());
+            updateLyricsView();
+        }
+    };
+    addAndMakeVisible(loadLrcButton);
+
     regularFontSizeLabel.setJustificationType(juce::Justification::right);
     regularFontSizeLabel.setText("Text Size", juce::NotificationType::dontSendNotification);
     regularFontSizeLabel.attachToComponent(&regularFontSizeSlider, true);
@@ -63,8 +76,10 @@ void LyricsEditor::resized()
     auto area = getLocalBounds();
     if (settingsButton.getToggleState())
     {
-        auto settingsArea = area.removeFromTop(3 * 10 + 2 * 24).reduced(10);
+        auto settingsArea = area.removeFromTop(4 * 10 + 3 * 24).reduced(10);
         settingsArea.removeFromLeft(100);   // space for labels
+        loadLrcButton.setBounds(settingsArea.removeFromTop(24));
+        settingsArea.removeFromTop(10);
         auto row = settingsArea.removeFromTop(24);
         regularColourChangeButton.setBounds(row.removeFromRight(70));
         row.removeFromRight(6);

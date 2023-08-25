@@ -67,6 +67,8 @@ private:
 
     IconButton settingsButton;
 
+    juce::TextButton loadLrcButton;
+
     juce::Label regularFontSizeLabel;
     juce::Slider regularFontSizeSlider;
     ColourChangeButton regularColourChangeButton;

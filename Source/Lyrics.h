@@ -28,7 +28,6 @@ protected:
 		juce::Font& regularFont, juce::Colour regularColour,
 		juce::Font& boldFont, juce::Colour boldColour);
 
-private:
 	double bpm = 120.0;
 	juce::OwnedArray<Line> lines;
 };
