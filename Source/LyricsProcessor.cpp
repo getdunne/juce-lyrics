@@ -59,10 +59,12 @@ void LyricsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
         if (hostPosition)
         {
             auto hostBpm = hostPosition->getBpm();
+            double refBpm = getBpm();
             auto timeSec = hostPosition->getTimeInSeconds();
             if (timeSec && hostBpm)
             {
-                currentTimeSec = *timeSec * *hostBpm / getBpm();
+                currentTimeSec = *timeSec;
+                if (refBpm != 0.0) currentTimeSec *= (*hostBpm / refBpm);
                 auto ll = getLineForTime(currentTimeSec);
                 if (ll != currentLyricLine) currentLyricLineChanged = true;
                 currentLyricLine = ll;

@@ -34,7 +34,7 @@ void Lyrics::putXml(juce::XmlElement* xml)
     if (xml)
     {
         jassert(xml->hasTagName("Lyrics"));
-        bpm = xml->getDoubleAttribute("bpm", 120.0);
+        bpm = xml->getDoubleAttribute("bpm");
         for (auto cueXml : xml->getChildWithTagNameIterator("LyricLine"))
         {
             auto ll = new Line;

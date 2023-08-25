@@ -13,9 +13,9 @@ public:
 		void putXml(juce::XmlElement* xml);
 	};
 
-	void clear() { lines.clear(); bpm = 120.0; }
+	void clear() { lines.clear(); bpm = 0.0; }
 	bool isEmpty() { return lines.isEmpty(); }
-	double getBpm() { return bpm; }
+	double getBpm() { return bpm; }	// returns 0.0 if no reference BPM available
 
 	void loadLrcFile(juce::File);
 	Line* getLineForTime(double timeSec);
@@ -28,6 +28,6 @@ protected:
 		juce::Font& regularFont, juce::Colour regularColour,
 		juce::Font& boldFont, juce::Colour boldColour);
 
-	double bpm = 120.0;
+	double bpm = 0.0;
 	juce::OwnedArray<Line> lines;
 };
