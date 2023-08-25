@@ -54,25 +54,42 @@ void Lyrics::loadLrcFile(juce::File lrcFile)
     lrcFile.readLines(fileLines);
     for (auto& fileLine : fileLines)
     {
-        if (fileLine.isNotEmpty())
+        if (! fileLine.startsWithChar('['))
         {
-            if (fileLine.matchesWildcard("[??:??.??]*", true))
-            {
-                double timeSec = 60 * fileLine.substring(1, 3).getIntValue();
-                int indexOfRightBracket = fileLine.indexOf("]");
-                timeSec += fileLine.substring(4, indexOfRightBracket).getDoubleValue();
-                lines.add(new Line({ timeSec, std::numeric_limits<double>::max(), fileLine.substring(indexOfRightBracket + 1).trim() }));
-            }
-            else if (fileLine.matchesWildcard("[bpm:*", true))
-            {
-                bpm = fileLine.substring(5).getDoubleValue();
-            }
+            // non-lyric ("other") line
+            lines.add(new Line({ 0.0, 0.0, fileLine.trim() }));
+        }
+        else if (fileLine.matchesWildcard("[??:??.??]*", true))
+        {
+            // lyric line
+            double timeSec = 60 * fileLine.substring(1, 3).getIntValue();
+            int indexOfRightBracket = fileLine.indexOf("]");
+            timeSec += fileLine.substring(4, indexOfRightBracket).getDoubleValue();
+            lines.add(new Line({ timeSec, std::numeric_limits<double>::max(), fileLine.substring(indexOfRightBracket + 1).trim() }));
+        }
+        else if (fileLine.matchesWildcard("[bpm:*", true))
+        {
+            // reference BPM tag
+            bpm = fileLine.substring(5).getDoubleValue();
         }
     }
 
-    // fix cue end-times (except the last one)
+    // fix lyric-line end-times (except the last one)
     for (int i = 0; i < (lines.size() - 1); i++)
-        lines[i]->endSec = lines[i + 1]->startSec;
+    {
+        if (lines[i]->endSec == std::numeric_limits<double>::max())
+        {
+            // search past any non-lyric lines for next lyric line
+            for (int j = i + 1; j < lines.size(); j++)
+            {
+                if (lines[j]->endSec == std::numeric_limits<double>::max())
+                {
+                    lines[i]->endSec = lines[j]->startSec;
+                    break;
+                }
+            }
+        }
+    }
 }
 
 Lyrics::Line* Lyrics::getLineForTime(double timeSec)
@@ -83,8 +100,9 @@ Lyrics::Line* Lyrics::getLineForTime(double timeSec)
 }
 
 void Lyrics::getViewForTime(double timeSec, juce::TextEditor& view,
-                            juce::Font& regularFont, juce::Colour regularColour,
-                            juce::Font& boldFont, juce::Colour boldColour)
+                            juce::Font& lyricsFont, juce::Colour lyricsColour,
+                            juce::Font& highlightFont, juce::Colour highlightColour,
+                            juce::Font& otherFont, juce::Colour otherColour)
 {
     view.clear();
     view.setCaretPosition(0);
@@ -96,14 +114,19 @@ void Lyrics::getViewForTime(double timeSec, juce::TextEditor& view,
     {
         if ((timeSec >= ll->startSec) && (timeSec < ll->endSec))
         {
-            view.setFont(boldFont);
-            view.setColour(juce::TextEditor::textColourId, boldColour);
+            view.setFont(highlightFont);
+            view.setColour(juce::TextEditor::textColourId, highlightColour);
             startOfBoldText = view.getCaretPosition();
+        }
+        else if (ll->endSec > ll->startSec)
+        {
+            view.setFont(lyricsFont);
+            view.setColour(juce::TextEditor::textColourId, lyricsColour);
         }
         else
         {
-            view.setFont(regularFont);
-            view.setColour(juce::TextEditor::textColourId, regularColour);
+            view.setFont(otherFont);
+            view.setColour(juce::TextEditor::textColourId, otherColour);
         }
         view.insertTextAtCaret(ll->text + "\n");
     }

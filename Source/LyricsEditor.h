@@ -69,13 +69,17 @@ private:
 
     juce::TextButton loadLrcButton;
 
-    juce::Label regularFontSizeLabel;
-    juce::Slider regularFontSizeSlider;
-    ColourChangeButton regularColourChangeButton;
+    juce::Label lyricsFontSizeLabel;
+    juce::Slider lyricsFontSizeSlider;
+    ColourChangeButton lyricsColourChangeButton;
 
-    juce::Label boldFontSizeLabel;
-    juce::Slider boldFontSizeSlider;
-    ColourChangeButton boldColourChangeButton;
+    juce::Label highlightFontSizeLabel;
+    juce::Slider highlightFontSizeSlider;
+    ColourChangeButton highlightColourChangeButton;
+
+    juce::Label otherFontSizeLabel;
+    juce::Slider otherFontSizeSlider;
+    ColourChangeButton otherColourChangeButton;
 
     juce::TextEditor lyricsView;
 

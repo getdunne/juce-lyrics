@@ -18,37 +18,53 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
     };
     addAndMakeVisible(loadLrcButton);
 
-    regularFontSizeLabel.setJustificationType(juce::Justification::right);
-    regularFontSizeLabel.setText("Text Size", juce::NotificationType::dontSendNotification);
-    regularFontSizeLabel.attachToComponent(&regularFontSizeSlider, true);
-    regularFontSizeSlider.setRange(10.0, 60.0, 1.0);
-    regularFontSizeSlider.setValue(double(lyricsProcessor.regularFontHeight), juce::NotificationType::dontSendNotification);
-    regularFontSizeSlider.onValueChange = [this]()
+    lyricsFontSizeLabel.setJustificationType(juce::Justification::right);
+    lyricsFontSizeLabel.setText("Lyrics", juce::NotificationType::dontSendNotification);
+    lyricsFontSizeLabel.attachToComponent(&lyricsFontSizeSlider, true);
+    lyricsFontSizeSlider.setRange(10.0, 60.0, 1.0);
+    lyricsFontSizeSlider.setValue(double(lyricsProcessor.lyricsFontHeight), juce::NotificationType::dontSendNotification);
+    lyricsFontSizeSlider.onValueChange = [this]()
     {
-        lyricsProcessor.regularFontHeight = int(regularFontSizeSlider.getValue());
+        lyricsProcessor.lyricsFontHeight = int(lyricsFontSizeSlider.getValue());
         updateLyricsView();
     };
-    addAndMakeVisible(regularFontSizeSlider);
+    addAndMakeVisible(lyricsFontSizeSlider);
 
-    regularColourChangeButton.colour = &(lyricsProcessor.regularColour);
-    regularColourChangeButton.onColourChange = [this]() { updateLyricsView(); };
-    addAndMakeVisible(regularColourChangeButton);
+    lyricsColourChangeButton.colour = &(lyricsProcessor.lyricsColour);
+    lyricsColourChangeButton.onColourChange = [this]() { updateLyricsView(); };
+    addAndMakeVisible(lyricsColourChangeButton);
 
-    boldFontSizeLabel.setJustificationType(juce::Justification::right);
-    boldFontSizeLabel.setText("Bold Size", juce::NotificationType::dontSendNotification);
-    boldFontSizeLabel.attachToComponent(&boldFontSizeSlider, true);
-    boldFontSizeSlider.setRange(10.0, 60.0, 1.0);
-    boldFontSizeSlider.setValue(double(lyricsProcessor.boldFontHeight), juce::NotificationType::dontSendNotification);
-    boldFontSizeSlider.onValueChange = [this]()
+    highlightFontSizeLabel.setJustificationType(juce::Justification::right);
+    highlightFontSizeLabel.setText("Highlight", juce::NotificationType::dontSendNotification);
+    highlightFontSizeLabel.attachToComponent(&highlightFontSizeSlider, true);
+    highlightFontSizeSlider.setRange(10.0, 60.0, 1.0);
+    highlightFontSizeSlider.setValue(double(lyricsProcessor.highlightFontHeight), juce::NotificationType::dontSendNotification);
+    highlightFontSizeSlider.onValueChange = [this]()
     {
-        lyricsProcessor.boldFontHeight = int(boldFontSizeSlider.getValue());
+        lyricsProcessor.highlightFontHeight = int(highlightFontSizeSlider.getValue());
         updateLyricsView();
     };
-    addAndMakeVisible(boldFontSizeSlider);
+    addAndMakeVisible(highlightFontSizeSlider);
 
-    boldColourChangeButton.colour = &(lyricsProcessor.boldColour);
-    boldColourChangeButton.onColourChange = [this]() { updateLyricsView(); };
-    addAndMakeVisible(boldColourChangeButton);
+    highlightColourChangeButton.colour = &(lyricsProcessor.highlightColour);
+    highlightColourChangeButton.onColourChange = [this]() { updateLyricsView(); };
+    addAndMakeVisible(highlightColourChangeButton);
+
+    otherFontSizeLabel.setJustificationType(juce::Justification::right);
+    otherFontSizeLabel.setText("Other", juce::NotificationType::dontSendNotification);
+    otherFontSizeLabel.attachToComponent(&otherFontSizeSlider, true);
+    otherFontSizeSlider.setRange(10.0, 60.0, 1.0);
+    otherFontSizeSlider.setValue(double(lyricsProcessor.otherFontHeight), juce::NotificationType::dontSendNotification);
+    otherFontSizeSlider.onValueChange = [this]()
+    {
+        lyricsProcessor.otherFontHeight = int(otherFontSizeSlider.getValue());
+        updateLyricsView();
+    };
+    addAndMakeVisible(otherFontSizeSlider);
+
+    otherColourChangeButton.colour = &(lyricsProcessor.otherColour);
+    otherColourChangeButton.onColourChange = [this]() { updateLyricsView(); };
+    addAndMakeVisible(otherColourChangeButton);
 
     lyricsView.setMultiLine(true);
     lyricsView.setReadOnly(true);
@@ -61,7 +77,7 @@ LyricsEditor::LyricsEditor(LyricsProcessor& p)
     addAndMakeVisible(settingsButton);
 
     setResizable(true, true);
-    setSize (512, 300);
+    setSize (512, 400);
 
     lyricsProcessor.addChangeListener(this);
 }
@@ -76,19 +92,28 @@ void LyricsEditor::resized()
     auto area = getLocalBounds();
     if (settingsButton.getToggleState())
     {
-        auto settingsArea = area.removeFromTop(4 * 10 + 3 * 24).reduced(10);
+        auto settingsArea = area.removeFromTop(5 * 10 + 4 * 24).reduced(10);
         settingsArea.removeFromLeft(100);   // space for labels
+
         loadLrcButton.setBounds(settingsArea.removeFromTop(24));
         settingsArea.removeFromTop(10);
+
         auto row = settingsArea.removeFromTop(24);
-        regularColourChangeButton.setBounds(row.removeFromRight(70));
+        lyricsColourChangeButton.setBounds(row.removeFromRight(70));
         row.removeFromRight(6);
-        regularFontSizeSlider.setBounds(row);
+        lyricsFontSizeSlider.setBounds(row);
         settingsArea.removeFromTop(10);
+
         row = settingsArea.removeFromTop(24);
-        boldColourChangeButton.setBounds(row.removeFromRight(70));
+        highlightColourChangeButton.setBounds(row.removeFromRight(70));
         row.removeFromRight(6);
-        boldFontSizeSlider.setBounds(row);
+        highlightFontSizeSlider.setBounds(row);
+        settingsArea.removeFromTop(10);
+
+        row = settingsArea.removeFromTop(24);
+        otherColourChangeButton.setBounds(row.removeFromRight(70));
+        row.removeFromRight(6);
+        otherFontSizeSlider.setBounds(row);
     }
     lyricsView.setBounds(area);
 
@@ -106,5 +131,5 @@ void LyricsEditor::paint (juce::Graphics& g)
 void LyricsEditor::updateLyricsView()
 {
     lyricsProcessor.getLyricsView(lyricsView);
-    lyricsView.scrollEditorToPositionCaret(0, lyricsView.getHeight() / 2 - lyricsProcessor.boldFontHeight);
+    lyricsView.scrollEditorToPositionCaret(0, lyricsView.getHeight() / 2 - lyricsProcessor.highlightFontHeight);
 }

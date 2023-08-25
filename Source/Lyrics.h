@@ -25,8 +25,9 @@ public:
 
 protected:
 	void getViewForTime(double timeSec, juce::TextEditor& view,
-		juce::Font& regularFont, juce::Colour regularColour,
-		juce::Font& boldFont, juce::Colour boldColour);
+		juce::Font& lyricsFont, juce::Colour lyricsColour,
+		juce::Font& highlightFont, juce::Colour highlightColour,
+		juce::Font& otherFont, juce::Colour otherColour);
 
 	double bpm = 0.0;
 	juce::OwnedArray<Line> lines;

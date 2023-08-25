@@ -22,10 +22,12 @@ LyricsProcessor::LyricsProcessor()
     , currentLyricLine(nullptr)
     , currentTimeSec(0.0)
     , backgroundColour(juce::Colours::black)
-    , regularColour(juce::Colours::white)
-    , boldColour(juce::Colours::aqua)
-    , regularFontHeight(20)
-    , boldFontHeight(24)
+    , lyricsColour(juce::Colours::white)
+    , highlightColour(juce::Colours::aqua)
+    , otherColour(juce::Colours::lightgreen)
+    , lyricsFontHeight(20)
+    , highlightFontHeight(24)
+    , otherFontHeight(14)
 {
     clear();
     lines.add(new Line({ 0.0, 1.0, "Click icon to open Settings," }));
@@ -78,18 +80,22 @@ void LyricsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
 
 void LyricsProcessor::getLyricsView(juce::TextEditor& view)
 {
-    juce::Font regularFont(regularFontHeight);
-    juce::Font boldFont(boldFontHeight, juce::Font::bold);
-    getViewForTime(currentTimeSec, view, regularFont, regularColour, boldFont, boldColour);
+    juce::Font lyricsFont(lyricsFontHeight);
+    juce::Font highlightFont(highlightFontHeight, juce::Font::bold);
+    juce::Font otherFont(otherFontHeight);
+    getViewForTime(currentTimeSec, view,
+        lyricsFont, lyricsColour, highlightFont, highlightColour, otherFont, otherColour);
 }
 
 void LyricsProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     std::unique_ptr<juce::XmlElement> xml(new juce::XmlElement("Lyrics"));
-    xml->setAttribute("regularFontHeight", regularFontHeight);
-    xml->setAttribute("boldFontHeight", boldFontHeight);
-    xml->setAttribute("regularColour", regularColour.toString());
-    xml->setAttribute("boldColour", boldColour.toString());
+    xml->setAttribute("lyricsFontHeight", lyricsFontHeight);
+    xml->setAttribute("highlightFontHeight", highlightFontHeight);
+    xml->setAttribute("lyricsColour", lyricsColour.toString());
+    xml->setAttribute("highlightColour", highlightColour.toString());
+    xml->setAttribute("otherColour", otherColour.toString());
+    xml->setAttribute("highlightColour", highlightColour.toString());
     xml->addChildElement(getXml());
     copyXmlToBinary(*xml, destData);
 }
@@ -98,13 +104,15 @@ void LyricsProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     auto xml = getXmlFromBinary(data, sizeInBytes);
 
-    regularFontHeight = xml->getIntAttribute("regularFontHeight", regularFontHeight);
-    boldFontHeight = xml->getIntAttribute("boldFontHeight", boldFontHeight);
+    lyricsFontHeight = xml->getIntAttribute("lyricsFontHeight", lyricsFontHeight);
+    highlightFontHeight = xml->getIntAttribute("highlightFontHeight", highlightFontHeight);
 
-    juce::String colour = xml->getStringAttribute("regularColour");
-    if (colour.isNotEmpty()) regularColour = juce::Colour::fromString(colour);
-    colour = xml->getStringAttribute("boldColour");
-    if (colour.isNotEmpty()) boldColour = juce::Colour::fromString(colour);
+    juce::String colour = xml->getStringAttribute("lyricsColour");
+    if (colour.isNotEmpty()) lyricsColour = juce::Colour::fromString(colour);
+    colour = xml->getStringAttribute("highlightColour");
+    if (colour.isNotEmpty()) highlightColour = juce::Colour::fromString(colour);
+    colour = xml->getStringAttribute("otherColour");
+    if (colour.isNotEmpty()) otherColour = juce::Colour::fromString(colour);
 
     putXml(xml->getChildByName("Lyrics"));
     sendChangeMessage();

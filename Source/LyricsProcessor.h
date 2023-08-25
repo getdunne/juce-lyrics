@@ -37,8 +37,8 @@ public:
 
     juce::String getCurrentLyric() { return currentLyricLine ? currentLyricLine->text : juce::String(); }
 
-    juce::Colour backgroundColour, regularColour, boldColour;
-    int regularFontHeight, boldFontHeight;
+    juce::Colour backgroundColour, lyricsColour, highlightColour, otherColour;
+    int lyricsFontHeight, highlightFontHeight, otherFontHeight;
 
     void getLyricsView(juce::TextEditor& view);
 
