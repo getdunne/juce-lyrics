@@ -19,8 +19,13 @@ LyricsProcessor::LyricsProcessor()
                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                       )
-    , currentCue(nullptr)
+    , currentLyricLine(nullptr)
     , currentTimeSec(0.0)
+    , backgroundColour(juce::Colours::black)
+    , regularColour(juce::Colours::white)
+    , boldColour(juce::Colours::aqua)
+    , regularFontHeight(20)
+    , boldFontHeight(24)
 {
     juce::File lrcFile("C:\\Users\\owner\\Documents\\GitHub\\juce-lyrics\\LRC Files\\test.lrc");
     loadLrcFile(lrcFile);
@@ -32,7 +37,7 @@ LyricsProcessor::~LyricsProcessor()
 
 void LyricsProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
-    currentCue = nullptr;
+    currentLyricLine = nullptr;
     currentTimeSec = 0.0;
 }
 
@@ -44,7 +49,7 @@ void LyricsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
 {
     if (isEmpty()) return;
 
-    bool currentCueChanged = false;
+    bool currentLyricLineChanged = false;
 
     auto ph = getPlayHead();
     if (ph)
@@ -52,40 +57,52 @@ void LyricsProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiB
         auto hostPosition = ph->getPosition();
         if (hostPosition)
         {
+            auto hostBpm = hostPosition->getBpm();
             auto timeSec = hostPosition->getTimeInSeconds();
-            if (timeSec)
+            if (timeSec && hostBpm)
             {
-                currentTimeSec = *timeSec;
-                auto cue = getCueForTime(*timeSec);
-                if (cue != currentCue) currentCueChanged = true;
-
-                if (cue)
-                {
-                    currentCue = cue;
-                    currentLyric = cue->text;
-                }
-                else currentLyric.clear();
+                currentTimeSec = *timeSec * *hostBpm / getBpm();
+                auto ll = getLineForTime(currentTimeSec);
+                if (ll != currentLyricLine) currentLyricLineChanged = true;
+                currentLyricLine = ll;
             }
         }
     }
 
-    if (currentCueChanged)
+    if (currentLyricLineChanged)
         sendChangeMessage();
 }
 
-void LyricsProcessor::getLyricsView(juce::TextEditor& view,
-                                    int regularFontHeight, juce::Colour regularColour,
-                                    int boldFontHeight, juce::Colour boldColour)
+void LyricsProcessor::getLyricsView(juce::TextEditor& view)
 {
     juce::Font regularFont(regularFontHeight);
     juce::Font boldFont(boldFontHeight, juce::Font::bold);
-    getLyricsViewForTime(currentTimeSec, view, regularFont, regularColour, boldFont, boldColour);
+    getViewForTime(currentTimeSec, view, regularFont, regularColour, boldFont, boldColour);
 }
 
 void LyricsProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
+    std::unique_ptr<juce::XmlElement> xml(new juce::XmlElement("Lyrics"));
+    xml->setAttribute("regularFontHeight", regularFontHeight);
+    xml->setAttribute("boldFontHeight", boldFontHeight);
+    xml->setAttribute("regularColour", regularColour.toString());
+    xml->setAttribute("boldColour", boldColour.toString());
+    xml->addChildElement(getXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void LyricsProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
+    auto xml = getXmlFromBinary(data, sizeInBytes);
+
+    regularFontHeight = xml->getIntAttribute("regularFontHeight", regularFontHeight);
+    boldFontHeight = xml->getIntAttribute("boldFontHeight", boldFontHeight);
+
+    juce::String colour = xml->getStringAttribute("regularColour");
+    if (colour.isNotEmpty()) regularColour = juce::Colour::fromString(colour);
+    colour = xml->getStringAttribute("boldColour");
+    if (colour.isNotEmpty()) boldColour = juce::Colour::fromString(colour);
+
+    putXml(xml->getChildByName("Lyrics"));
+    sendChangeMessage();
 }

@@ -3,9 +3,14 @@
 <JUCERPROJECT id="CVP2rD" name="Lyrics" projectType="audioplug" addUsingNamespaceToJuceHeader="0"
               jucerFormatVersion="1" projectLineFeed="&#10;" pluginFormats="buildAU,buildVST3">
   <MAINGROUP id="DksJsW" name="Lyrics">
+    <GROUP id="{850F7B3B-C953-9C3E-D0DF-D55825EDD842}" name="Assets">
+      <FILE id="TPT1eN" name="settings.svg" compile="0" resource="1" file="Assets/settings.svg"/>
+    </GROUP>
     <GROUP id="{2063D8EA-2821-FEB2-A6C9-264B3A4A96CB}" name="Source">
-      <FILE id="WZFDBw" name="TimedText.cpp" compile="1" resource="0" file="Source/TimedText.cpp"/>
-      <FILE id="q99A7S" name="TimedText.h" compile="0" resource="0" file="Source/TimedText.h"/>
+      <FILE id="heFVqe" name="IconButton.h" compile="0" resource="0" file="Source/IconButton.h"/>
+      <FILE id="QIFpbG" name="IconButton.cpp" compile="1" resource="0" file="Source/IconButton.cpp"/>
+      <FILE id="WZFDBw" name="Lyrics.cpp" compile="1" resource="0" file="Source/Lyrics.cpp"/>
+      <FILE id="q99A7S" name="Lyrics.h" compile="0" resource="0" file="Source/Lyrics.h"/>
       <FILE id="lkgAWC" name="LyricsProcessor.cpp" compile="1" resource="0"
             file="Source/LyricsProcessor.cpp"/>
       <FILE id="hZJoQn" name="LyricsProcessor.h" compile="0" resource="0"

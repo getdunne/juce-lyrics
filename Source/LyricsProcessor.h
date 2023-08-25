@@ -1,10 +1,10 @@
 #pragma once
 #include <JuceHeader.h>
-#include "TimedText.h"
+#include "Lyrics.h"
 
 class LyricsProcessor   : public juce::AudioProcessor
                         , public juce::ChangeBroadcaster
-                        , public TimedText
+                        , public Lyrics
 {
 public:
     LyricsProcessor();
@@ -33,12 +33,14 @@ public:
     void getStateInformation(juce::MemoryBlock& destData) override;
     void setStateInformation(const void* data, int sizeInBytes) override;
 
-    juce::String currentLyric;
-    TimedText::Cue* currentCue;
+    Lyrics::Line* currentLyricLine;
 
-    void getLyricsView(juce::TextEditor& view,
-        int regularFontHeight, juce::Colour regularColour,
-        int boldFontHeight, juce::Colour boldColour);
+    juce::String getCurrentLyric() { return currentLyricLine ? currentLyricLine->text : juce::String(); }
+
+    juce::Colour backgroundColour, regularColour, boldColour;
+    int regularFontHeight, boldFontHeight;
+
+    void getLyricsView(juce::TextEditor& view);
 
 private:
     double currentTimeSec;

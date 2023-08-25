@@ -1,6 +1,49 @@
 #pragma once
 #include <JuceHeader.h>
 #include "LyricsProcessor.h"
+#include "IconButton.h"
+
+class ColourChangeButton    : public juce::TextButton
+                            , public juce::ChangeListener
+{
+public:
+    std::function<void()> onColourChange;
+    juce::Colour* colour = nullptr;
+
+    ColourChangeButton() : TextButton("Color...")
+    {
+        setSize(10, 24);
+        changeWidthToFitText();
+    }
+
+    void clicked() override
+    {
+        auto colourSelector = std::make_unique<juce::ColourSelector>(juce::ColourSelector::showAlphaChannel
+            | juce::ColourSelector::showColourAtTop
+            | juce::ColourSelector::editableColour
+            | juce::ColourSelector::showSliders
+            | juce::ColourSelector::showColourspace);
+
+        colourSelector->setName("background");
+        if (colour) colourSelector->setCurrentColour(*colour);
+        colourSelector->addChangeListener(this);
+        colourSelector->setColour(juce::ColourSelector::backgroundColourId, juce::Colours::transparentBlack);
+        colourSelector->setSize(300, 400);
+
+        juce::CallOutBox::launchAsynchronously(std::move(colourSelector), getScreenBounds(), nullptr);
+    }
+
+    using TextButton::clicked;
+
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override
+    {
+        if (auto* cs = dynamic_cast<juce::ColourSelector*> (source))
+        {
+            if (colour) *colour = cs->getCurrentColour();
+            if (onColourChange) onColourChange();
+        }
+    }
+};
 
 class LyricsEditor  : public juce::AudioProcessorEditor
                     , public juce::ChangeListener
@@ -14,7 +57,7 @@ public:
     void paint (juce::Graphics&) override;
 
     // juce::ChangeListener
-    void changeListenerCallback(juce::ChangeBroadcaster*) { updateLyricsView(); }
+    void changeListenerCallback(juce::ChangeBroadcaster*) override { updateLyricsView(); }
 
 protected:
     void updateLyricsView();
@@ -22,8 +65,16 @@ protected:
 private:
     LyricsProcessor& lyricsProcessor;
 
-    juce::Colour backgroundColour, regularColour, boldColour;
-    int regularFontHeight, boldFontHeight;
+    IconButton settingsButton;
+
+    juce::Label regularFontSizeLabel;
+    juce::Slider regularFontSizeSlider;
+    ColourChangeButton regularColourChangeButton;
+
+    juce::Label boldFontSizeLabel;
+    juce::Slider boldFontSizeSlider;
+    ColourChangeButton boldColourChangeButton;
+
     juce::TextEditor lyricsView;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LyricsEditor)
