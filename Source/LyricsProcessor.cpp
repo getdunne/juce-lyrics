@@ -20,7 +20,6 @@ LyricsProcessor::LyricsProcessor()
                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                       )
     , currentLyricLine(nullptr)
-    , currentTimeSec(0.0)
     , backgroundColour(juce::Colours::black)
     , lyricsColour(juce::Colours::white)
     , highlightColour(juce::Colours::aqua)
@@ -28,6 +27,7 @@ LyricsProcessor::LyricsProcessor()
     , lyricsFontHeight(20)
     , highlightFontHeight(24)
     , otherFontHeight(14)
+    , currentTimeSec(0.0)
 {
     clear();
 }
